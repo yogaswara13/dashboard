@@ -8,30 +8,116 @@ class FakultasController extends Controller
 {
     public function detailMahasiswa(){
         $data['mahasiswa'] = [];
+        $data['mahasiswa']['mhs_aktif'] = [];
 
-        for ($i=0; $i < 7 ; $i++) {
-            $angkatan = date("Y") - $i . 1;
-            $query = "where=kode_fakultas='UNPAS3' AND mulai_smt=$angkatan";
+        $tahun_angkatan = [];
 
-            $mahasiswa_aktif[] = [
-                "angkatan" => (date("Y")-$i),
-                "jumlah" => getTotalData('/mahasiswa', $query),
-                "jml_mhs_pria" => getTotalData('/mahasiswa', $query." AND id_jenis_kelamin='L'"),
-                "jml_mhs_wanita" => getTotalData('/mahasiswa', $query." AND id_jenis_kelamin='P'")
-            ];
+        for ($i=0; $i < 7; $i++) { 
+            array_push($tahun_angkatan, date('Y') - $i . '1', date('Y') - $i . '2', date('Y') - $i . '3');
+            array_push($data['mahasiswa']['mhs_aktif'], 
+            [
+                'angkatan' => strval(date('Y') - $i),
+                'jumlah' => 0,
+                'jml_mhs_pria' => 0,
+                'jml_mhs_wanita' => 0,
+            ]
+            );
         }
-        for ($i=1; $i < 6; $i++) {
-            $query_prodi = "where=kode_fakultas='UNPAS3' AND kode_prodi='30$i' AND mulai_smt BETWEEN 2016 AND 2021";
-            $mahasiswa_aktif_prodi[] =[
-                "prodi" => "30$i",
-                "jumlah" => getTotalData('/mahasiswa', $query_prodi),
-                "jumlah_pria" => getTotalData('/mahasiswa', $query_prodi." AND id_jenis_kelamin='L'"),
-                "jumlah_wanita" => getTotalData('/mahasiswa', $query_prodi." AND id_jenis_kelamin='P'"),
-            ];
-        }
-        $data['mahasiswa']['prodi'] = $mahasiswa_aktif_prodi;
-        $data['mahasiswa']['mhs_aktif'] = array_reverse($mahasiswa_aktif);
 
+        $mahasiswa_aktif = $this->postRequest(
+            '/mahasiswa',
+            [
+                'select' => 'count(*) as jumlah, mulai_smt as angkatan',
+                'group' => 'mulai_smt', 'id_jenis_kelamin',
+                'where' => 'kode_fakultas="UNPAS3" AND mulai_smt IN (' . implode(',', $tahun_angkatan) . ') AND tgl_keluar IS NOT NULL'
+            ]
+            )->result;
+
+        $mahasiswa_laki_laki_aktif = $this->postRequest(
+            '/mahasiswa',
+            [
+                'select' => 'count(*) as jumlah, mulai_smt as angkatan',
+                'group' => 'mulai_smt', 'id_jenis_kelamin',
+                'where' => 'kode_fakultas="UNPAS3" AND mulai_smt IN (' . implode(',', $tahun_angkatan) . ') AND tgl_keluar IS NOT NULL AND id_jenis_kelamin="L"'
+            ]
+            )->result;
+
+        $mahasiswa_perempuan_aktif = $this->postRequest(
+            '/mahasiswa',
+            [
+                'select' => 'count(*) as jumlah, mulai_smt as angkatan',
+                'group' => 'mulai_smt', 'id_jenis_kelamin',
+                'where' => 'kode_fakultas="UNPAS3" AND mulai_smt IN (' . implode(',', $tahun_angkatan) . ') AND tgl_keluar IS NOT NULL AND id_jenis_kelamin="P"'
+            ]
+            )->result;
+
+        $mahasiswa_prodi = $this->postRequest(
+            '/mahasiswa',
+            [
+                'select' => 'count(*) as jumlah, kode_prodi as prodi',
+                'group' => 'kode_prodi',
+                'where' => 'kode_fakultas="UNPAS3" AND mulai_smt IN (' . implode(',', $tahun_angkatan) . ') AND tgl_keluar IS NOT NULL'
+            ]
+            )->result;
+
+        $mahasiswa_laki_laki_prodi = $this->postRequest(
+            '/mahasiswa',
+            [
+                'select' => 'count(*) as jumlah, kode_prodi as prodi',
+                'group' => 'kode_prodi',
+                'where' => 'kode_fakultas="UNPAS3" AND mulai_smt IN (' . implode(',', $tahun_angkatan) . ') AND tgl_keluar IS NOT NULL AND id_jenis_kelamin="L"'
+            ]
+            )->result;
+
+        $mahasiswa_perempuan_prodi = $this->postRequest(
+            '/mahasiswa',
+            [
+                'select' => 'count(*) as jumlah, kode_prodi as prodi',
+                'group' => 'kode_prodi',
+                'where' => 'kode_fakultas="UNPAS3" AND mulai_smt IN (' . implode(',', $tahun_angkatan) . ') AND tgl_keluar IS NOT NULL AND id_jenis_kelamin="P"'
+            ]
+            )->result;
+
+        foreach ($mahasiswa_prodi as $key => $value) {
+            $value->jumlah_pria = $value->prodi == $mahasiswa_laki_laki_prodi[$key]->prodi ? $mahasiswa_laki_laki_prodi[$key]->jumlah : 0;
+            $value->jumlah_wanita = $value->prodi == $mahasiswa_perempuan_prodi[$key]->prodi ? $mahasiswa_perempuan_prodi[$key]->jumlah : 0;
+        }
+
+        $data['mahasiswa']['prodi'] = $mahasiswa_prodi;
+
+        foreach ($mahasiswa_aktif as $value) {
+            foreach ($mahasiswa_laki_laki_aktif as $valueLaki) {
+                if($valueLaki->angkatan == $value->angkatan) {
+                    $value->jml_mhs_pria = $valueLaki->jumlah;
+                    break;
+                } else {
+                    $value->jml_mhs_pria = 0;
+                }
+            }
+
+            foreach ($mahasiswa_perempuan_aktif as $valuePerempuan) {
+                if($valuePerempuan->angkatan == $value->angkatan) {
+                    $value->jml_mhs_wanita = $valuePerempuan->jumlah;
+                    break;
+                } else {
+                    $value->jml_mhs_wanita = 0;
+                }
+            }
+        }
+
+        foreach ($data['mahasiswa']['mhs_aktif'] as $key => $value) {
+            foreach ($mahasiswa_aktif as $value_mahasiswa) {
+                if(strpos($value_mahasiswa->angkatan, $value['angkatan']) !== false) {
+                    $value['jumlah'] += $value_mahasiswa->jumlah;
+                    $value['jml_mhs_pria'] += $value_mahasiswa->jml_mhs_pria;
+                    $value['jml_mhs_wanita'] += $value_mahasiswa->jml_mhs_wanita;
+                }
+            }
+            $data['mahasiswa']['mhs_aktif'][$key] = $value;
+        }
+
+        $data['mahasiswa']['mhs_aktif'] = array_reverse($data['mahasiswa']['mhs_aktif']);
+        
         $data['namaData'] = "Mahasiswa";
         $data['subMenu'] = "Mahasiswa";
         $data['menu'] = "Detail Data Fakultas";

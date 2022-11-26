@@ -94,22 +94,22 @@
                       <tbody>
                       @foreach ($mahasiswa['prodi'] as $item)
                           <tr>
-                            @if ($item['prodi'] == "301")
+                            @if ($item->prodi == "301")
                                 <td>S1 - Teknik Industri</td>
-                            @elseif ($item['prodi'] == "302")
+                            @elseif ($item->prodi == "302")
                                 <td>S1 - Teknologi Pangan</td>
-                            @elseif ($item['prodi'] == "303")
+                            @elseif ($item->prodi == "303")
                                 <td>S1 - Teknik Mesin</td>
-                            @elseif ($item['prodi'] == "304")
+                            @elseif ($item->prodi == "304")
                                 <td>S1 - Teknik Informatika</td>
-                            @elseif ($item['prodi'] == "305")
+                            @elseif ($item->prodi == "305")
                                 <td>S1 - Teknik Lingkungan</td>
-                            @elseif ($item['prodi'] == "306")
+                            @elseif ($item->prodi == "306")
                                 <td>S1 - Teknik Perencanaan Wilayah & Tata Kota</td>
                             @endif
-                            <td>{{ $item['jumlah'] }}</td>
-                            <td>{{ $item['jumlah_pria'] }}</td>
-                            <td>{{ $item['jumlah_wanita'] }}</td>
+                            <td>{{ $item->jumlah }}</td>
+                            <td>{{ $item->jumlah_pria }}</td>
+                            <td>{{ $item->jumlah_wanita }}</td>
                           </tr>
                       @endforeach
                       </tbody>

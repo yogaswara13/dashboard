@@ -8,29 +8,62 @@ class ProdiController extends Controller
 {
     public function detailProdi(Request $request){
         $select_data = "kode_hash, kode, kode_fakultas, fakultas, singkatan_fakultas, kode_unit_kerja, nama, prodi, singkatan_prodi, stat_prodi";
-        $angkatan = session('angkatan_query');
-        $angkatan_ams = angkatanAms();
+
+        $data['detail_prodi'] = $this->getRequest(
+            '/master/prodi',
+            [
+                'select' => $select_data,
+                'where' => 'kode=' . $request->kode
+            ]
+            )->result[0];
+
+        $data['jml_mahasiswa'] = $this->getRequest(
+            '/mahasiswa/count',
+            [
+                'where' => 'mulai_smt BETWEEN "2016" AND "2022" AND kode_prodi = ' . $request->kode
+            ]
+            )->jumlah_data;
+
+        $data['jml_dosen'] = $this->getRequest(
+            '/dosen/count',
+            [
+                'where' => 'kode_hash_prodi = "' . $request->id . '"'
+            ]
+            )->jumlah_data;
+
+        $alumni = $this->getRequest(
+            '/mahasiswa/wisuda',
+            [
+                'where' => 'statusMahasiswa="Lulus" AND ProdiID=' . $request->kode
+            ]
+            );
+        $data['jml_alumni'] = $alumni->jumlah_data;
+
+        $tahun = date('n') >= 8 ? date("Y") : date("Y") - 1;
+
+        $data['jml_dpp'] = $this->getRequest(
+            '/mahasiswa/dpp',
+            [
+                'where' => 'kode_prodi=' . $request->kode . ' AND kode_tahun=' . $tahun
+            ]
+            )->jumlah_data;
+
+        $data['avg_ipk'] = $this->getRequest(
+            '/mahasiswa/rerataIpk',
+            [
+                'where' => 'kode_prodi=' . $request->kode
+            ]
+            )->result[0]->rerata_ipk;
+
+        $data['ams_mhs'] = $this->getRequest(
+            '/mahasiswa/count',
+            [
+                'where' => 'kode_prodi=' . $request->kode . ' AND mulai_smt=' . strval(date('Y') - 6) . '1 AND tgl_keluar IS NOT NULL'
+            ]
+            )->jumlah_data;
+
         $data['menu'] = "dashboard";
         $data['subMenu'] = "Detail Prodi";
-        $data['detail_prodi'] = getData('/master/prodi', "where=kode_hash='$request->id'", 0, $select_data, '')->result[0];
-
-        $data['jml_mahasiswa'] = getTotalData('/mahasiswa/count', "where=mulai_smt BETWEEN '2016' AND '2022' AND kode_fakultas='UNPAS3' AND kode_prodi='$request->kode'", NULL, NULL, NULL);
-
-        $data['jml_dosen'] = getTotalData('/dosen/count', "where=kode_fakultas='UNPAS3' AND kode_hash_prodi='$request->id'") ;
-
-        $data['jml_alumni'] = getTotalData('/mahasiswa/wisuda', "where=FakultasID=3 AND statusMahasiswa='Lulus' AND ProdiID='$request->kode'");
-
-        if (date('n') >= 8) {
-            $kode_tahun = date("Y");
-        }else{
-            $kode_tahun = date("Y") - 1;
-        }
-        $data['jml_dpp'] = getTotalData('/mahasiswa/dpp', "where=kode_prodi='$request->kode' AND kode_tahun='$kode_tahun'");
-
-        $data['avg_ipk'] = getData('/mahasiswa/rerataIpk', "where=kode_prodi='$request->kode'", NULL , NULL, NULL)->result[0]->rerata_ipk;
-
-
-        $data['ams_mhs'] = getTotalData('/mahasiswa/count', "where=kode_fakultas='UNPAS3' AND kode_prodi='$request->kode' AND mulai_smt=$angkatan_ams AND tgl_keluar IS NOT NULL", 0, NULL, 'KODE');
 
         return view('pages.detail.jurusan.detail-prodi', $data);
     }

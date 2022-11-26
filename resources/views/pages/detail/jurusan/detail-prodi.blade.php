@@ -48,7 +48,6 @@
                   </div>
                   <!-- /.col -->
 
-
                   <div class="col-md-4">
                     <div class="small-box bg-info">
                       <div class="inner">
@@ -67,6 +66,7 @@
                     </div>
                   </div>
                   <!-- /.col -->
+
                   <div class="col-md-4">
                     <div class="small-box bg-info">
                       <div class="inner">
@@ -85,7 +85,6 @@
                     </div>
                   </div>
                   <!-- /.col -->
-
 
                   <div class="col-md-4">
                     <div class="small-box bg-warning">
@@ -107,7 +106,6 @@
                   </div>
                   <!-- /.col -->
 
-
                   <div class="col-md-4">
                     <div class="small-box bg-warning">
                       <div class="inner">
@@ -126,6 +124,7 @@
                     </div>
                   </div>
                   <!-- /.col -->
+                  
                   <div class="col-md-4">
                     <div class="small-box bg-warning">
                       <div class="inner">

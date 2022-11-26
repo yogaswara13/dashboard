@@ -21,29 +21,47 @@ class PagesController extends Controller
      */
     public function home()
     {
-        $q_mahasiswa = 'where=mulai_smt BETWEEN "2016" AND "2022" AND kode_fakultas="UNPAS3"';
-        $data['jml_mahasiswa'] = getTotalData('/mahasiswa/count', $q_mahasiswa);
-        $data['jml_dosen'] = getTotalData('/dosen/count', "where=kode_fakultas='UNPAS3'");
-        $data['jml_alumni'] = getTotalData('/mahasiswa/wisuda', "where=FakultasID=3 AND statusMahasiswa='Lulus'");
+        $tahun_angkatan = [];
+
+        for ($i=0; $i < 7; $i++) { 
+            array_push($tahun_angkatan, date('Y') - $i . '1', date('Y') - $i . '2', date('Y') - $i . '3');
+        }
+
+        $mahasiswaResult = $this->postRequest('/mahasiswa', [
+            'select' => 'count(*) as total_mhs, kode_prodi',
+            'group' => 'kode_prodi',
+            'where' => 'kode_fakultas="UNPAS3" AND mulai_smt IN (' . implode(',', $tahun_angkatan) . ') AND tgl_keluar IS NOT NULL'
+        ])->result;
+
+        $dosenResult = $this->postRequest('/dosen', [
+            'select' => 'count(*) as total_dosen, prodi',
+            'group' => 'kode_prodi',
+            'where' => 'kode_fakultas="UNPAS3"'
+        ])->result;
+
+        $alumniResult = $this->postRequest('/mahasiswa/wisuda', [
+            'select' => 'count(*) as total_alumni, ProdiID',
+            'group' => 'ProdiID',
+            'where' => 'FakultasID = "3" AND statusMahasiswa="Lulus"'
+        ])->result;
 
         $select_data_prodi = 'kode_hash, kode, kode_fakultas, kode_hash_fakultas, singkatan_fakultas, unit_kerja, singkatan, stat_prodi, nama, prodi';
 
-        $data_prodi = getData('/master/prodi', "where=kode_fakultas='UNPAS3'", 0, $select_data_prodi, 'kode')->result;
+        $data['prodi'] = $this->postRequest('/master/prodi', [
+            'select' => $select_data_prodi,
+            'where' => 'kode_fakultas="UNPAS3"'
+        ])->result;
 
-        foreach ($data_prodi as $value) {
-            $data["data_prodi"][] = [
-                'kode_prodi' => $value->kode,
-                'nama_prodi' => $value->nama,
-                'desc_prodi' => $value->prodi,
-                'akreditasi' => $value->stat_prodi,
-                'kode_hash_prodi' => $value->kode_hash,
-                'jml_mhs' => getTotalData('/mahasiswa/count', "$q_mahasiswa AND kode_prodi=$value->kode"),
-                'jml_dosen' => getTotalData('/dosen/count', "where=kode_fakultas='UNPAS3' AND kode_hash_prodi='$value->kode_hash'"),
-                'alumni' => getTotalData('/mahasiswa/wisuda', "where=FakultasID=3 AND statusMahasiswa='Lulus' AND ProdiID='$value->kode'")
-            ];
+        $data['jml_mahasiswa'] = array_sum(array_column($mahasiswaResult, 'total_mhs'));
+        $data['jml_dosen'] = array_sum(array_column($dosenResult, 'total_dosen'));
+        $data['jml_alumni'] = array_sum(array_column($alumniResult, 'total_alumni'));
+
+        foreach ($data['prodi'] as $key => $value) {
+            $value->total_mhs = $mahasiswaResult[$key]->total_mhs;
+            $value->total_dosen = $dosenResult[$key]->total_dosen;
+            $value->total_alumni = $alumniResult[$key]->total_alumni;
         };
 
-        // return $data_prodi;
         $data['menu'] = "Home";
         $data['subMenu'] = null;
 

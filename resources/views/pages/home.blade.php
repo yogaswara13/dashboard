@@ -191,103 +191,103 @@
 {{-- ========================================= Jurusan FT Unpas Dalam Angka ========================================= --}}
   <Section class="content" id="prodiDalamAngka">
     <div class="row justify-content-center">
-          <div class="col-12 px-3">
-            <div class="card collapsed-card">
-              <div class="card-header bg-orange">
-                    <h4 class="card-title text-white">Program Studi FT Unpas Dalam Angka</h4>
-                    <div class="card-tools">
-                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus text-white"></i>
-                      </button>
-                </div>
+        <div class="col-12 px-3">
+          <div class="card collapsed-card">
+            <div class="card-header bg-orange">
+                  <h4 class="card-title text-white">Program Studi FT Unpas Dalam Angka</h4>
+                  <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus text-white"></i>
+                    </button>
               </div>
+            </div>
 
-              <div class="card-body">
-                <div class="row">
+            <div class="card-body">
+              <div class="row">
 
-                    @foreach ($data_prodi as $item)
-                    <div class="col-md-4">
-                        <div class="card
-                            @if ($item['kode_prodi'] == "301")
-                                card-orange
-                            @elseif ($item['kode_prodi'] == "302")
-                                card-primary
-                            @elseif ($item['kode_prodi'] == "303")
-                                card-info
-                            @elseif ($item['kode_prodi'] == "304")
-                                card-success
-                            @elseif ($item['kode_prodi'] == "305")
-                                card-olive
-                            @elseif ($item['kode_prodi'] == "306")
-                                card-maroon
-                            @endif
-                        ">
-                        <div class="card-header text-white">
-                          <h3 class="card-title ">{!! $item['desc_prodi'] !!}</h3>
-                        </div>
-                        <div class="card-body">
-                          <div class="row ">
-                            <div class="col">
-                              <div class="card card-primary card-outline">
-                                <div class="card-body box-profile">
-                                  <div class="text-center">
-                                    <img class=" img-fluid img-circle"
-                                        @if ($item['kode_prodi'] == "301")
-                                            src="{{asset('assets/img/industri.png')}}"
-                                        @elseif ($item['kode_prodi'] == "302")
-                                            src="{{asset('assets/img/Pangan.png')}}"
-                                        @elseif ($item['kode_prodi'] == "303")
-                                            src="{{asset('assets/img/mesin.png')}}"
-                                        @elseif ($item['kode_prodi'] == "304")
-                                            src="{{asset('assets/img/iF.png')}}"
-                                        @elseif ($item['kode_prodi'] == "305")
-                                            src="{{asset('assets/img/lingkungan.png')}}"
-                                        @elseif ($item['kode_prodi'] == "306")
-                                            src="{{asset('assets/img/PWK.png')}}"
-                                        @endif
-                                        alt="Logo Program Studi" width="100px">
-                                  </div>
-
-                                  <h3 class="profile-username text-center">{{$item['nama_prodi'] }}</h3>
-
-                                  <ul class="list-group list-group-unbordered mb-3">
-                                    <li class="list-group-item border-0  d-flex justify-content-between align-items-center">
-                                      <b class="text-muted">Akreditasi</b> <a class="float-right text-muted">{{$item['akreditasi']}}</a>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center border-top">
-                                      <b>Mahasiswa</b>
-                                      <a class="float-right">{{ $item['jml_mhs'] }}</a>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                      <b>Dosen</b> <a class="float-right">{{ $item['jml_dosen'] }}</a>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                      <b>Alumni</b> <a class="float-right">{{$item['alumni'] }}</a>
-                                    </li>
-                                  </ul>
-
-                                  <a href="{{ route('detailJurusan.detailProdi', ['id' => $item['kode_hash_prodi'] , 'kode' => $item['kode_prodi']]) }}" class="btn btn-primary btn-block"><b>Detail</b></a>
+                  @foreach ($prodi as $item)
+                  <div class="col-md-4">
+                      <div class="card
+                          @if ($item->kode == "301")
+                              card-orange
+                          @elseif ($item->kode == "302")
+                              card-primary
+                          @elseif ($item->kode == "303")
+                              card-info
+                          @elseif ($item->kode == "304")
+                              card-success
+                          @elseif ($item->kode == "305")
+                              card-olive
+                          @elseif ($item->kode == "306")
+                              card-maroon
+                          @endif
+                      ">
+                      <div class="card-header text-white">
+                        <h3 class="card-title ">{!! $item->prodi !!}</h3>
+                      </div>
+                      <div class="card-body">
+                        <div class="row ">
+                          <div class="col">
+                            <div class="card card-primary card-outline">
+                              <div class="card-body box-profile">
+                                <div class="text-center">
+                                  <img class=" img-fluid img-circle"
+                                      @if ($item->kode == "301")
+                                          src="{{asset('assets/img/industri.png')}}"
+                                      @elseif ($item->kode == "302")
+                                          src="{{asset('assets/img/Pangan.png')}}"
+                                      @elseif ($item->kode == "303")
+                                          src="{{asset('assets/img/mesin.png')}}"
+                                      @elseif ($item->kode == "304")
+                                          src="{{asset('assets/img/iF.png')}}"
+                                      @elseif ($item->kode == "305")
+                                          src="{{asset('assets/img/lingkungan.png')}}"
+                                      @elseif ($item->kode == "306")
+                                          src="{{asset('assets/img/PWK.png')}}"
+                                      @endif
+                                      alt="Logo Program Studi" width="100px">
                                 </div>
-                                <!-- /.card-body -->
+
+                                <h3 class="profile-username text-center">{{$item->nama }}</h3>
+
+                                <ul class="list-group list-group-unbordered mb-3">
+                                  <li class="list-group-item border-0  d-flex justify-content-between align-items-center">
+                                    <b class="text-muted">Akreditasi</b> <a class="float-right text-muted">{{$item->stat_prodi}}</a>
+                                  </li>
+                                  <li class="list-group-item d-flex justify-content-between align-items-center border-top">
+                                    <b>Mahasiswa</b>
+                                    <a class="float-right">{{ $item->total_mhs }}</a>
+                                  </li>
+                                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <b>Dosen</b> <a class="float-right">{{ $item->total_dosen }}</a>
+                                  </li>
+                                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <b>Alumni</b> <a class="float-right">{{$item->total_alumni }}</a>
+                                  </li>
+                                </ul>
+
+                                <a href="{{ route('detailJurusan.detailProdi', ['id' => $item->kode_hash , 'kode' => $item->kode]) }}" class="btn btn-primary btn-block"><b>Detail</b></a>
                               </div>
-                              <!-- /.card -->
-                              {{-- ================================================================================= --}}
+                              <!-- /.card-body -->
                             </div>
+                            <!-- /.card -->
+                            {{-- ================================================================================= --}}
                           </div>
                         </div>
-                        <!-- /.card-body -->
                       </div>
-                      <!-- /.card -->
+                      <!-- /.card-body -->
                     </div>
+                    <!-- /.card -->
+                  </div>
 
-                    @endforeach
+                  @endforeach
 
-                  <!-- /.col -->
-                </div>
+                <!-- /.col -->
+              </div>
 
-                </div>
-            </div>
+              </div>
           </div>
-      </div>
+        </div>
+    </div>
   </Section>
 {{-- ========================================= Statistik FT UNPAS  ================================================= --}}
   {{-- <section class="content">
