@@ -103,15 +103,22 @@ class AuthController extends Controller
             ]
         );
 
+        
         // return $request;
-
+        
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }else{
             session()->put('username', $request->username);
-            initTokenKlien($request->username, $request->password);
-            initTokenPengguna($request->username, $request->password);
-            initUser();
+            $responseTokenKlien = initTokenKlien($request->username, $request->password);
+            
+            if($responseTokenKlien->code == 200) {
+                session()->put('token_klien', $responseTokenKlien->result->token);
+                initTokenPengguna($request->username, $request->password);
+                initUser();
+            } else {
+                return back()->with('error', $responseTokenKlien->message);
+            }
         }
 
         if( session('token_pengguna') ){

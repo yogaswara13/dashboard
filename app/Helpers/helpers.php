@@ -21,11 +21,7 @@ function initTokenKlien($username, $password){
 
     $dres = json_decode($res->getBody()->getContents());
 
-    if ($dres->code == 200) {
-        session()->put('token_klien', $dres->result->token);
-    }else{
-        return false;
-    }
+    return $dres;
 }
 
 function initTokenPengguna($username, $password){
@@ -36,6 +32,8 @@ function initTokenPengguna($username, $password){
     ]);
 
     $dres = json_decode($res->getBody()->getContents());
+
+    dd($dres);
 
     if($dres->code == 200){
         session()->put('token_pengguna', $dres->result->user_token);
@@ -52,6 +50,8 @@ function initUser(){
     $req = $client->get( getUrl() . "/pengguna?token=$token&where=kode='$username'", ['verify' => false]);
 
     $res = json_decode($req->getBody()->getContents());
+
+    dd($res);
 
     if($res->code == 200){
         session()->put('users', $res->result[0]);
